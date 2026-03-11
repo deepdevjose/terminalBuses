@@ -1,0 +1,135 @@
+╔══════════════════════════════════════════════════════════════════════╗
+║           🚀 GUÍA RÁPIDA DE ARRANQUE - Sistema de Boletos            ║
+╚══════════════════════════════════════════════════════════════════════╝
+
+┌─────────────────────────────────────────────────────────────────────┐
+│ 🪟 WINDOWS                                                           │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                      │
+│ 1. Abrir CMD o PowerShell                                           │
+│ 2. Ejecutar:                                                         │
+│                                                                      │
+│    cd C:\ruta\al\proyecto\busesTerminal                              │
+│    java -jar target\venta-boletos-1.0.0.jar                        │
+│                                                                      │
+│ 3. Ver tu IP:                                                        │
+│    ipconfig                                                          │
+│                                                                      │
+│ 4. Detener: Ctrl + C                                                │
+│                                                                      │
+│ ✨ BONUS: Crear archivo start-server.bat para doble clic           │
+│                                                                      │
+└─────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────┐
+│ 🍎 macOS                                                             │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                      │
+│ 1. Abrir Terminal                                                    │
+│ 2. Ejecutar:                                                         │
+│                                                                      │
+│    cd ~/ruta/al/proyecto/javainge                                   │
+│    java -jar target/venta-boletos-1.0.0.jar                        │
+│                                                                      │
+│ 3. Ver tu IP:                                                        │
+│    ipconfig getifaddr en0                                           │
+│                                                                      │
+│ 4. Detener: Ctrl + C  o  pkill -f venta-boletos                    │
+│                                                                      │
+│ ✨ BONUS: Ejecutar en background con nohup                          │
+│                                                                      │
+└─────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────┐
+│ 🐧 LINUX (Fedora/Ubuntu/Debian/RHEL/CentOS)                         │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                      │
+│ 1. Abrir Terminal                                                    │
+│ 2. Ejecutar:                                                         │
+│                                                                      │
+│    cd ~/Downloads/javainge                                          │
+│    java -jar target/venta-boletos-1.0.0.jar                        │
+│                                                                      │
+│ 3. Ver tu IP:                                                        │
+│    hostname -I | awk '{print $1}'                                   │
+│                                                                      │
+│ 4. Detener: Ctrl + C  o  pkill -f venta-boletos                    │
+│                                                                      │
+│ ✨ BONUS: Crear servicio systemd para inicio automático             │
+│                                                                      │
+└─────────────────────────────────────────────────────────────────────┘
+
+╔══════════════════════════════════════════════════════════════════════╗
+║                        📡 ACCESO EN RED                               ║
+╠══════════════════════════════════════════════════════════════════════╣
+║                                                                       ║
+║  Una vez iniciado, accede desde CUALQUIER dispositivo en tu WiFi:    ║
+║                                                                       ║
+║  http://TU_IP:8080/terminal/Terminal-1                              ║
+║  http://TU_IP:8080/terminal/Terminal-2                              ║
+║  http://TU_IP:8080/terminal/Terminal-3                              ║
+║                                                                       ║
+║  Ejemplo (IP actual): http://192.168.100.98:8080/terminal/Terminal-1║
+║                                                                       ║
+╚══════════════════════════════════════════════════════════════════════╝
+
+╔══════════════════════════════════════════════════════════════════════╗
+║                      🔥 CONFIGURAR FIREWALL                           ║
+╠══════════════════════════════════════════════════════════════════════╣
+║                                                                       ║
+║  🪟 Windows: Panel de Control → Firewall → Permitir puerto 8080     ║
+║                                                                       ║
+║  🍎 macOS:   sudo ufw allow 8080/tcp (si usas ufw)                  ║
+║                                                                       ║
+║  🐧 Linux:   sudo firewall-cmd --add-port=8080/tcp --permanent      ║
+║              sudo firewall-cmd --reload                              ║
+║                                                                       ║
+╚══════════════════════════════════════════════════════════════════════╝
+
+╔══════════════════════════════════════════════════════════════════════╗
+║                    📚 DOCUMENTACIÓN COMPLETA                          ║
+╠══════════════════════════════════════════════════════════════════════╣
+║                                                                       ║
+║  📄 NETWORK.md  (16 KB) - Guía completa de red y arranque           ║
+║  📄 INSTALL.md  (11 KB) - Instalación de Java y Maven               ║
+║  📄 TESTING.md  (6 KB)  - Pruebas y verificación                    ║
+║  📄 CHANGES.md  (9 KB)  - Registro de cambios                       ║
+║  📄 README.md   (5.8 KB)- Información general                        ║
+║                                                                       ║
+║  🔧 verificar-red.sh    - Script de verificación automática          ║
+║                                                                       ║
+╚══════════════════════════════════════════════════════════════════════╝
+
+╔══════════════════════════════════════════════════════════════════════╗
+║                         🎯 EJEMPLO PRÁCTICO                           ║
+╠══════════════════════════════════════════════════════════════════════╣
+║                                                                       ║
+║  Desde tu servidor:                                                   ║
+║  $ java -jar target/venta-boletos-1.0.0.jar                         ║
+║                                                                       ║
+║  Tu IP Local: 192.168.100.98 (ejemplo)                              ║
+║                                                                       ║
+║  Desde tu teléfono/tablet (mismo WiFi):                              ║
+║  - Abre navegador                                                    ║
+║  - Ve a: http://192.168.100.98:8080/terminal/Terminal-1            ║
+║  - ¡Compra boletos desde tu móvil! 🎫                                ║
+║                                                                       ║
+║  Desde otra computadora (misma red):                                 ║
+║  - Abre navegador                                                    ║
+║  - Ve a: http://192.168.100.98:8080/terminal/Terminal-2            ║
+║  - Ambos terminales pueden comprar simultáneamente ⚡                 ║
+║                                                                       ║
+╚══════════════════════════════════════════════════════════════════════╝
+
+╔══════════════════════════════════════════════════════════════════════╗
+║                     💡 CONSEJOS IMPORTANTES                           ║
+╠══════════════════════════════════════════════════════════════════════╣
+║                                                                       ║
+║  ✅ Spring Boot YA incluye Tomcat (no necesitas instalarlo)         ║
+║  ✅ El archivo application.properties ya está configurado           ║
+║  ✅ Todos los dispositivos deben estar en el MISMO WiFi             ║
+║  ✅ No cierres la ventana/terminal donde corre el servidor          ║
+║  ✅ Usa ./verificar-red.sh para verificar configuración (Linux)     ║
+║                                                                       ║
+╚══════════════════════════════════════════════════════════════════════╝
+

@@ -1,0 +1,6 @@
+com/itat/ventaboletos/model/Asiento.class
+com/itat/ventaboletos/service/AsientoService.class
+com/itat/ventaboletos/service/AsientoService$ResultadoCompra.class
+com/itat/ventaboletos/VentaBoletosApplication.class
+com/itat/ventaboletos/controller/TerminalController.class
+com/itat/ventaboletos/controller/AsientoApiController.class

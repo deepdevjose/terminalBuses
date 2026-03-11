@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terminal de venta - <span th:text="${terminalId}"></span></title>
+    <!-- Bootstrap 5 CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .seat-card {
+            margin: 5px;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .seat-card:hover {
+            transform: scale(1.05);
+        }
+        .seat-free {
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+        }
+        .seat-sold {
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+            cursor: not-allowed;
+        }
+        .terminal-badge {
+            font-size: 0.8rem;
+        }
+        .loading-spinner {
+            margin: 20px auto;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <h1>Terminal <span th:text="${terminalId}"></span></h1>
+        <div class="row mb-3">
+            <div class="col">
+                <button id="btnRandom" class="btn btn-primary">Comprar aleatorio</button>
+            </div>
+        </div>
+        <div id="seatGrid" class="row g-2">
+            <div class="col-12 text-center">
+                <div class="spinner-border text-primary loading-spinner" role="status" id="loadingSpinner">
+                    <span class="visually-hidden">Cargando...</span>
+                </div>
+            </div>
+        </div>
+        <div id="messageArea" class="mt-3"></div>
+    </div>
+
+    <!-- JavaScript -->
+    <script th:inline="javascript">
+        document.addEventListener('DOMContentLoaded', function() {
+            const terminalId = /*[[${terminalId}]]*/ 'Terminal-1';
+            const seatGrid = document.getElementById('seatGrid');
+            const messageArea = document.getElementById('messageArea');
+            const loadingSpinner = document.getElementById('loadingSpinner');
+            const btnRandom = document.getElementById('btnRandom');
+
+            // Función para mostrar mensajes al usuario
+            function showMessage(msg, isError = false) {
+                // Limpiar mensajes anteriores
+                messageArea.innerHTML = '';
+                const div = document.createElement('div');
+                div.className = `alert ${isError ? 'alert-danger' : 'alert-success'} alert-dismissible fade show`;
+                div.role = 'alert';
+                div.innerHTML = msg + '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>';
+                messageArea.appendChild(div);
+                // Auto eliminar después de 5 segundos
+                setTimeout(() => div.remove(), 5000);
+            }
+
+            // Función para renderizar la cuadrícula de asientos
+            function renderSeats(seats) {
+                // Ocultar spinner
+                loadingSpinner.style.display = 'none';
+                seatGrid.innerHTML = ''; // Limpiar grid
+
+                if (!seats || seats.length === 0) {
+                    seatGrid.innerHTML = '<div class="col-12"><p class="text-center">No hay asientos disponibles</p></div>';
+                    return;
+                }
+
+                seats.forEach(seat => {
+                    const col = document.createElement('div');
+                    col.className = 'col-6 col-sm-4 col-md-3 col-lg-2 mb-2'; // Responsive
+
+                    const card = document.createElement('div');
+                    card.className = `card seat-card ${seat.vendido ? 'seat-sold' : 'seat-free'}`;
+                    card.setAttribute('data-numero', seat.numero);
+
+                    const body = document.createElement('div');
+                    body.className = 'card-body p-2 text-center';
+
+                    let innerHtml = `<h6 class="card-title">Asiento ${seat.numero}</h6>`;
+                    if (seat.vendido) {
+                        innerHtml += `<p class="card-text terminal-badge text-danger">Vendido por ${seat.vendidoPorTerminal || '?'}</p>`;
+                    } else {
+                        innerHtml += `<p class="card-text text-success">Disponible</p>`;
+                    }
+                    body.innerHTML = innerHtml;
+                    card.appendChild(body);
+
+                    // Agregar evento de clic solo si está libre
+                    if (!seat.vendido) {
+                        card.addEventListener('click', () => comprarEspecifico(seat.numero));
+                    }
+
+                    col.appendChild(card);
+                    seatGrid.appendChild(col);
+                });
+            }
+
+            // Función para obtener los asientos desde el servidor
+            function fetchSeats() {
+                console.log('Obteniendo asientos...');
+                loadingSpinner.style.display = 'block';
+                seatGrid.innerHTML = ''; // Limpiar mientras carga
+                seatGrid.appendChild(loadingSpinner); // Asegurar que el spinner esté visible
+
+                fetch('/api/asientos')
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Error en la respuesta del servidor: ' + response.status);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log('Asientos recibidos:', data);
+                        renderSeats(data);
+                    })
+                    .catch(error => {
+                        console.error('Error al obtener asientos:', error);
+                        loadingSpinner.style.display = 'none';
+                        seatGrid.innerHTML = '<div class="col-12"><p class="text-center text-danger">Error al cargar asientos. Verifique la conexión.</p></div>';
+                        showMessage('No se pudieron cargar los asientos. Intente más tarde.', true);
+                    });
+            }
+
+            // Función para comprar aleatorio
+            function comprarAleatorio() {
+                console.log('Comprando aleatorio...');
+                fetch('/api/comprar-aleatorio?terminalId=' + encodeURIComponent(terminalId), {
+                    method: 'POST'
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Error en la respuesta del servidor: ' + response.status);
+                    }
+                    return response.json();
+                })
+                .then(result => {
+                    console.log('Resultado compra aleatoria:', result);
+                    if (result.exitoso) {
+                        showMessage(`¡Compra exitosa! Asiento ${result.asiento}`);
+                        fetchSeats(); // Actualizar la cuadrícula
+                    } else {
+                        showMessage(`No se pudo comprar: ${result.mensaje}`, true);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error en compra aleatoria:', error);
+                    showMessage('Error de conexión al realizar la compra.', true);
+                });
+            }
+
+            // Función para comprar específico
+            function comprarEspecifico(numero) {
+                console.log(`Comprando asiento específico ${numero}...`);
+                fetch('/api/comprar-especifico?terminalId=' + encodeURIComponent(terminalId) +
+                      '&numeroAsiento=' + numero, {
+                    method: 'POST'
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Error en la respuesta del servidor: ' + response.status);
+                    }
+                    return response.json();
+                })
+                .then(result => {
+                    console.log(`Resultado compra asiento ${numero}:`, result);
+                    if (result.exitoso) {
+                        showMessage(`¡Compra exitosa! Asiento ${result.asiento}`);
+                        fetchSeats(); // Actualizar la cuadrícula
+                    } else {
+                        showMessage(`No se pudo comprar el asiento ${numero}: ${result.mensaje}`, true);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error en compra específica:', error);
+                    showMessage('Error de conexión al realizar la compra.', true);
+                });
+            }
+
+            // Asignar evento al botón de compra aleatoria
+            btnRandom.addEventListener('click', comprarAleatorio);
+
+            // Cargar asientos al inicio
+            fetchSeats();
+
+            // Actualizar cada 5 segundos (polling)
+            setInterval(fetchSeats, 5000);
+        });
+    </script>
+
+    <!-- Bootstrap JS (opcional para algunos componentes) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+</html>
